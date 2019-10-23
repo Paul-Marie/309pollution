@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+
+from sys import argv, stderr, exit
+from math import factorial, pow
+
+def Bernstein(u, m, i):
+        """  """
+        return factorial(m) / (factorial(i) * factorial(m - i)) * pow(u, i) * pow(1 - u, m - i)
+
+# Do not modify this class, his default comportement is necessary for the program
+class   BadArgumentError(Exception):
+    def __init__(self, message, errors = "BadArgumentError"):
+        super().__init__(message)
+        self.errors = errors
+
+# Default object class
+class   Pollution():
+    """ Definition of Construct class """
+    points = []
+    def __init__(self, argument):
+        """ Initialise Separation's instance and check little errors """
+        self.n = int(argument[1])
+        self.fd = open(argument[2], 'r')
+        self.x = float(argument[3])
+        self.y = float(argument[4])
+        self.buff = self.fd.read().rstrip().split('\n')
+        for i in self.buff:
+            self.points.append({"x": int(i.split(';')[0]),
+                "y": int(i.split(';')[1]), "p": int(i.split(';')[2])})
+
+    def computeValue(self):
+        """ Calculate all printable value required by printValue method """
+        self.result = []
+        for i in range(self.n):
+            tmp = []
+            for d in range(self.n):
+                if self.points[i]["x"] == i and self.points[i]["y"] == d:
+                    tmp.append(self.points[i]["p"])
+                else:
+                    tmp.append(0)
+            self.result.append(tmp)
+        self.coef = 0
+        for i in range(self.n):
+            for d in range(self.n):
+                self.coef += (Bernstein(self.x, self.n, i + 1) *
+                              Bernstein(self.y, self.n, i + 1) * self.result[i][d])
+
+    def printValue(self):
+        """ Print all computed value into the tab """
+        print("{:.2f}".format(self.coef))
+
+# Do not put more information in this function, it's must be clearer as possible
+def     main():
+    """ Main function who perform program's core action like arguments resolution """
+    if len(argv) is not 5:
+        raise BadArgumentError("Usage: ./309pollution n file x y")
+    obj = Pollution(argv)
+    obj.computeValue()
+    obj.printValue()
+
+# Don't touch at this except if u don't worry of problems
+if __name__ == "__main__":
+    try:
+        main()
+    except BaseException as error:
+        stderr.write(str(type(error).__name__) + ": {}\n".format(error))
+        exit(84)
